@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Apartment Search</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='icons8-building-with-rooftop-terrace-48.png') }}">
+<style>
+html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
+* {box-sizing:border-box}
+
+</style>
+</head>
+<body class="w3-light-grey">
+
+<!-- Page Container -->
+<div class="w3-content w3-margin-top" style="max-width:1400px;">
+
+  <!-- The Grid -->
+  <div class="w3-row-padding">
+  
+    <!-- Left Column -->
+    <div class="w3-third">
+    
+      <div class="w3-white w3-text-grey w3-card-4">
+        <div class="w3-display-container">
+          <img src="static/marla-prusik-5q1KnUjtjaM-unsplash.jpg" style="width:100%" alt="Avatar">
+          <div class="w3-display-bottomleft w3-container w3-text-black">
+          </div>
+        </div>
+        <div class="w3-container">
+      
+          <hr>
+
+          <p class="w3-large"><b><i class="fa fa-fw w3-margin-right w3-text-teal"></i>Hailey's Apartment Search</b></p>
+          <br>
+        </div>
+      </div><br>
+
+    <!-- End Left Column -->
+    </div>
+
+    <!-- Right Column -->
+    <div class="w3-twothird">
+    
+      <div class="w3-container w3-card w3-white w3-margin-bottom">
+        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-certificate fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Criteria</h2>
+
+        <h5 class="w3-opacity"><b>Location</b></h5>
+        <ul>
+          <li>Atlanta, GA</li>
+        </ul><hr>
+
+        <h5 class="w3-opacity"><b>Baths</b></h5>
+        <ul>
+          <li>1+ Bathrooms</li>
+        </ul><hr>
+
+        <h5 class="w3-opacity"><b>Ammenities</b></h5>
+        <ul>
+          <li>Air Conditioning</li>
+          <li>In Unit Washer & Dryer</li>
+          <li>Cat Friendly</li>
+          <li>Hardwood Floors</li>
+          <li>Balcony</li>
+          <li>Walk-In Closets</li>
+        </ul> <hr>
+
+        <h5 class="w3-opacity"><b>Affordability</b></h5>
+        <ul>
+          <li>Cheap</li> 
+        </ul><hr>
+
+        <h5 class="w3-opacity"><b>Rating</b></h5>
+        <ul>
+          <li>5 stars</li>
+        </ul>
+      </div>
+
+      <div class="w3-container w3-card w3-white">
+        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-home fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Results</h2>
+        <button id="retrieveBtn" onclick="getResults()" style="margin-bottom: 15px;">Retrieve Results</button>
+        <div id="resultsContain"></div>
+        
+      </div>
+
+    <!-- End Right Column -->
+    </div>
+    
+  <!-- End Grid -->
+  </div>
+  
+  <!-- End Page Container -->
+</div>
+
+<footer class="w3-container w3-teal w3-center w3-margin-top">
+
+</footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+  function getResults(){
+    document.getElementById("retrieveBtn").innerHTML = 'Loading...';
+    document.getElementById("retrieveBtn").disabled = 'true';
+    $.ajax({
+      url: "/scrape",
+      type: "GET",
+    }).done(function(response) {
+        document.getElementById("retrieveBtn").style.display = "none";
+        var jsResult = JSON.parse(response);
+        let aptKeys = Object.keys(jsResult);
+        let contain = document.getElementById("resultsContain");
+        for(let i = 0; i < aptKeys.length; i++){
+          // create h6 element for each apartment title
+          let title = document.createElement("h6");
+          title.innerText  = aptKeys[i];
+          contain.appendChild(title);
+          getSpecifics(jsResult, aptKeys, i);
+        }
+    });
+  }
+
+  // function to handle getting the address, price, beds, phone number, and images for each apartment
+  function getSpecifics(result, keys, index){
+    // create list of attributes for each apartment
+    let contain = document.getElementById("resultsContain");
+    let addressList = document.createElement("ul");
+    contain.appendChild(addressList);
+
+    for(let j = 0; j < result[keys[index]].length; j++){
+      if(j < 4){
+        // create list items for each attribute and add to list
+        let aptVal = document.createElement("li");
+        aptVal.innerText  = result[keys[index]][j];
+        addressList.appendChild(aptVal);
+      } else {
+        if(j == 4){
+          var slidesDiv = document.createElement("div")
+          contain.appendChild(slidesDiv);
+        }
+        let slideImg = document.createElement("img")
+        slideImg.src = ""+result[keys[index]][j];
+        slideImg.style.cssText = "width:100%"
+        slidesDiv.appendChild(slideImg);
+      }
+    }
+  }
+</script>
+</body>
+</html>
